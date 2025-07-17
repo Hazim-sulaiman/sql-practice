@@ -1,0 +1,248 @@
+
+-- ---------------------------------------------------
+-- CREATE TABLE: Units
+-- This table stores information about inspected units
+-- ---------------------------------------------------
+CREATE TABLE units (
+  id INT NOT NULL,
+  unit_name VARCHAR(50) NOT NULL,
+  inspection_date DATE,
+  location VARCHAR(50) NOT NULL
+);
+
+-- View all records in the units table
+SELECT * FROM units;
+
+-- Add a new column 'inspection_team' to the units table
+ALTER TABLE units
+ADD inspection_team VARCHAR(50) NOT NULL;
+
+-- Insert multiple rows into units table
+INSERT INTO units (id, unit_name, inspection_date, location, inspection_team)
+VALUES
+  (5, 'hospital', NULL, 'Riffa', 'TeamA'),
+  (2, 'FMB', '2025-02-11', 'Hamala', 'TeamB');
+
+-- ---------------------------------------------------
+-- CREATE TABLE: Workers
+-- This table stores preventive health center workers
+-- ---------------------------------------------------
+CREATE TABLE workers (
+  id INT NOT NULL,
+  worker_name VARCHAR(50) NOT NULL,
+  birthday DATE,
+  phone VARCHAR(20)
+);
+
+-- Add PRIMARY KEY to workers table
+ALTER TABLE workers
+ADD CONSTRAINT pk_workers PRIMARY KEY (id);
+
+-- View all records from workers table
+SELECT * FROM workers;
+
+-- Add new column 'email' to workers table
+ALTER TABLE workers
+ADD email VARCHAR(50) NOT NULL;
+
+-- Remove 'phone' column from workers table
+ALTER TABLE workers
+DROP COLUMN phone;
+
+-- Delete the entire workers table (structure + data)
+DROP TABLE workers;
+
+-- ---------------------------------------------------
+-- Insert & Update operations on Units
+-- ---------------------------------------------------
+
+-- Insert one new record into units
+INSERT INTO units
+VALUES (7, 'Nevy', '2025-03-17', 'Muharaq', 'TeamA');
+
+-- Update inspection date for unit with id = 5
+UPDATE units
+SET inspection_date = '2025-06-01'
+WHERE id = 5;
+
+-- View units inspected by TeamA
+SELECT * FROM units
+WHERE inspection_team = 'TeamA';
+
+-- ---------------------------------------------------
+-- VIEW Customers, Countries, and Orders data
+-- ---------------------------------------------------
+SELECT * FROM Customers;
+
+-- Show all unique countries from Customers
+SELECT DISTINCT Country 
+FROM Customers;
+
+-- Create table Clients to store basic customer info
+CREATE TABLE Clients (
+  Clients_id INT NOT NULL,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Country VARCHAR(50) NOT NULL,
+  score INT,
+  CONSTRAINT PK_clients PRIMARY KEY (Clients_id)
+);
+
+-- Add email column to Clients table
+ALTER TABLE Clients
+ADD email VARCHAR(50);
+
+-- Remove email column from Clients table
+ALTER TABLE Clients
+DROP COLUMN email;
+
+-- View all records in Clients table
+SELECT * FROM Clients;
+
+-- Insert multiple records into Clients table
+INSERT INTO Clients (Clients_id, FirstName, LastName, Country, score)
+VALUES 
+  (11, 'Fahad', 'Essa', 'Jordan', 650),
+  (12, 'Mona', 'Ahmed', 'Bahrain', 950);
+
+-- View all records in Orders
+SELECT * FROM Orders;
+
+-- ---------------------------------------------------
+-- Sorting, Filtering, and Aggregation Examples
+-- ---------------------------------------------------
+
+-- Select orders data (only OrderStatus and Quantity)
+SELECT OrderStatus, Quantity
+FROM Orders;
+
+-- Filter Customers from Germany
+SELECT * 
+FROM Customers
+WHERE Country = 'Germany';
+
+-- Sort Customers by Country ASC and Score DESC
+SELECT * 
+FROM Customers
+ORDER BY Country ASC, Score DESC;
+
+-- Group Customers by Country with average score
+SELECT
+  Country, 
+  AVG(Score) AS average_score, 
+  COUNT(CustomerID) AS total_customers
+FROM Customers
+GROUP BY Country
+ORDER BY average_score DESC;
+
+-- Update score for customer with ID 7
+UPDATE Customers
+SET Score = 1100
+WHERE CustomerID = 7;
+
+-- Update score for customer with ID 8
+UPDATE Customers
+SET Score = 2000
+WHERE CustomerID = 8;
+
+-- Show average score by country where score > 430
+SELECT Country, AVG(Score) AS average_score
+FROM Customers
+WHERE Score != 0
+GROUP BY Country
+HAVING average_score > 430
+ORDER BY average_score DESC;
+
+-- Count customers by country
+SELECT DISTINCT Country, COUNT(CustomerID)
+FROM Customers
+GROUP BY Country;
+
+-- ---------------------------------------------------
+-- Table: Persons
+-- Used for basic customer data mapping
+-- ---------------------------------------------------
+
+-- Create table persons
+CREATE TABLE persons (
+  person_id INT NOT NULL,
+  person_name VARCHAR(50) NOT NULL,
+  birth_date DATE,
+  phone VARCHAR(50) NOT NULL
+);
+
+-- Add PRIMARY KEY to persons
+ALTER TABLE persons
+ADD CONSTRAINT pk_persons PRIMARY KEY (person_id);
+
+-- Add email column to persons
+ALTER TABLE persons
+ADD email VARCHAR(50) NOT NULL;
+
+-- View customers with specific CustomerIDs
+SELECT * FROM Customers WHERE CustomerID IN (8, 2, 3);
+
+-- Get the customer with the highest score
+SELECT Country, Score
+FROM Customers
+WHERE Score = (
+  SELECT MAX(Score) FROM Customers
+);
+
+-- Same as above but using ORDER BY and LIMIT
+SELECT Country, Score
+FROM Customers
+ORDER BY Score DESC
+LIMIT 1;
+
+-- ---------------------------------------------------
+-- Inserting and Deleting Data
+-- ---------------------------------------------------
+
+-- Delete customer with ID 7
+DELETE FROM Customers
+WHERE CustomerID = 7;
+
+-- Insert single customer into Customers
+INSERT INTO Customers (CustomerID, FirstName, LastName, Country, Score)
+VALUE (9, 'Jad', 'Bob', 'Italy', 550);
+
+-- Insert another customer
+INSERT INTO Customers
+VALUE (10, 'Naji', 'Sam', 'Italy', 350);
+
+-- Insert multiple customers
+INSERT INTO Customers
+VALUE
+  (11, 'Raj', 'Dodo', 'India', 200),
+  (12, 'Lachmi', 'Babo', 'India', 150),
+  (13, 'Saad', 'Ahmed', 'UAE', 1000);
+
+-- Insert selected columns from Customers into Persons
+INSERT INTO persons
+SELECT 
+  CustomerID,
+  FirstName,
+  NULL,
+  'UNKNOWN'
+FROM Customers;
+
+-- Update score for customer ID 3
+UPDATE Customers
+SET Score = 600
+WHERE CustomerID = 3;
+
+-- Count customers by country again
+SELECT DISTINCT Country, COUNT(CustomerID)
+FROM Customers
+GROUP BY Country;
+
+-- Update customer 8’s score and country
+UPDATE Customers
+SET Score = 650,
+    Country = 'USA'
+WHERE CustomerID = 8;
+
+-- ---------------------------------------------------
+-- END OF SCRIPT
+-- ---------------------------------------------------
